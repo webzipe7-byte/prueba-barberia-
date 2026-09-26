@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Agenda del personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f4f0; --surface:#ffffff; --surface-2:#efece6; --line:#e1ddd5;
+    --text:#16140f; --muted:#6d6860; --accent:#a8792f; --accent-ink:#ffffff; --accent-soft:rgba(168,121,47,.12);
+    --pole-red:#b3261e; --pole-blue:#1f3f8f; --ok:#2f8f5b; --ok-soft:rgba(47,143,91,.12); --err:#c0392b; --warn:#b7791f; --busy:#b3261e; --busy-soft:rgba(179,38,30,.10);
+    --display:"Big Shoulders Display","Oswald","Arial Narrow",sans-serif;
+    --body:Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;
+    --r:12px;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e0d0c; --surface:#171513; --surface-2:#211e1b; --line:#2d2925;
+      --text:#f3efe8; --muted:#a39d93; --accent:#d4a857; --accent-ink:#141210; --accent-soft:rgba(212,168,87,.13);
+      --pole-red:#c8352c; --pole-blue:#3a5fc0; --ok:#5cc28a; --ok-soft:rgba(92,194,138,.13); --err:#ef6b5e; --warn:#e0a84a; --busy:#ef6b5e; --busy-soft:rgba(239,107,94,.14);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e0d0c; --surface:#171513; --surface-2:#211e1b; --line:#2d2925;
+    --text:#f3efe8; --muted:#a39d93; --accent:#d4a857; --accent-ink:#141210; --accent-soft:rgba(212,168,87,.13);
+    --pole-red:#c8352c; --pole-blue:#3a5fc0; --ok:#5cc28a; --ok-soft:rgba(92,194,138,.13); --err:#ef6b5e; --warn:#e0a84a; --busy:#ef6b5e; --busy-soft:rgba(239,107,94,.14);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,p{margin:0}
+  button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+  a{color:inherit}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+  .wrap{max-width:1000px;margin:0 auto;padding-inline:16px}
+  .num{font-variant-numeric:tabular-nums}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+  .hint{color:var(--muted);font-size:13px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:11px 18px;font-weight:700;font-size:14px;transition:filter .15s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+  .btn-line{background:transparent;color:var(--text);border:1px solid var(--line)}
+  .btn-line:hover{border-color:var(--text);filter:none}
+  .btn-sm{padding:8px 14px;font-size:13px}
+
+  .topbar{border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px}
+  .brand{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.04em;text-transform:uppercase;line-height:1}
+  .brand small{display:block;font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);margin-top:4px}
+  .pole{height:6px;background:repeating-linear-gradient(-45deg,var(--pole-red) 0 12px,var(--bg) 12px 18px,var(--pole-blue) 18px 30px,var(--bg) 30px 36px)}
+
+  main{padding-block:32px 120px}
+  h1{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:clamp(36px,6vw,56px);line-height:.95;margin-top:6px}
+  .lede{color:var(--muted);max-width:60ch;margin-top:10px}
+  .block{margin-top:28px}
+  .label{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+
+  .barbers{display:flex;gap:8px;flex-wrap:wrap}
+  .barber{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border:1px solid var(--line);border-radius:999px;font-size:14px;font-weight:600;background:var(--surface)}
+  .barber i{width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800}
+  .barber.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .barber.sel i{background:var(--accent);color:var(--accent-ink)}
+
+  .days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+  .day{flex:0 0 68px;border:1px solid var(--line);border-radius:10px;padding:8px 0 6px;font-size:12px;color:var(--muted);text-align:center;background:var(--surface)}
+  .day b{display:block;font-size:20px;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.2}
+  .day em{display:block;font-style:normal;font-size:11px;font-weight:700;color:var(--muted);margin-top:2px}
+  .day em.has{color:var(--busy)}
+  .day.sel{border-color:var(--accent);background:var(--accent-soft)}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+  .card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .card-head h2{font-size:17px;font-weight:700}
+  #day-title::first-letter,.bk .when::first-letter{text-transform:uppercase}
+  .tools{display:flex;gap:8px;flex-wrap:wrap}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:12px;height:12px;border-radius:3px;border:1px solid var(--line);display:inline-block}
+  .legend .l-free{border-color:var(--ok)}
+  .legend .l-busy{background:var(--busy-soft);border-color:var(--busy)}
+  .legend .l-book{background:var(--accent-soft);border-color:var(--accent)}
+  .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+  .slot{border:1px solid var(--line);border-radius:8px;padding:10px 6px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;text-align:center;background:var(--bg);line-height:1.25}
+  .slot small{display:block;font-size:11px;font-weight:600;color:var(--muted)}
+  .slot small.ok{color:var(--ok)}
+  .slot.busy{border-color:var(--busy);background:var(--busy-soft)}
+  .slot.busy small{color:var(--busy)}
+  .slot.booked{border-color:var(--accent);background:var(--accent-soft);cursor:default}
+  .slot.booked small{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .slot:disabled:not(.booked){opacity:.35;cursor:not-allowed}
+
+  .bookings{display:flex;flex-direction:column}
+  .bk{display:grid;grid-template-columns:170px 1fr auto;gap:14px;align-items:center;padding-block:12px;border-bottom:1px solid var(--line);font-size:14px}
+  .bk:last-child{border-bottom:0}
+  .bk .when{font-weight:700;font-variant-numeric:tabular-nums}
+  .bk .who small{display:block;color:var(--muted);font-size:13px}
+  .empty{color:var(--muted);font-size:14px;padding-block:6px}
+
+  .bar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px))}
+  .bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .state{font-size:14px;display:flex;align-items:center;gap:10px}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--ok);flex-shrink:0}
+  .state.dirty .dot{background:var(--warn)}
+  .state small{display:block;color:var(--muted);font-size:12px}
+  .bar .btn{padding:13px 26px;font-size:15px}
+  /* Inicio de sesión (demo) */
+  body.locked{overflow:hidden}
+  body.locked > :not(.login){visibility:hidden}
+  .login{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--bg)}
+  .login::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:repeating-linear-gradient(-45deg,var(--pole-red) 0 14px,var(--bg) 14px 22px,var(--pole-blue) 22px 36px,var(--bg) 36px 44px)}
+  .login-card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px 24px}
+  .login-card .mark{width:44px;height:44px;border:1.5px solid var(--text);border-radius:50%;display:grid;place-items:center;margin-bottom:16px}
+  .login-card h2{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:34px;line-height:.95;margin-top:6px}
+  .login-card .field{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+  .login-card label{font-size:13px;font-weight:600}
+  .login-card input,.login-card select{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px;font:inherit;font-size:14px;color:var(--text);outline:none;width:100%}
+  .login-card select{appearance:none;cursor:pointer;padding-right:40px;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat}
+  .login-card select:invalid{color:var(--muted)}
+  .login-card option{color:var(--text);background:var(--surface)}
+  .login-card input:focus,.login-card select:focus{border-color:var(--accent)}
+  .login-card .btn{width:100%;margin-top:20px;padding:13px}
+  .login-card .err{color:var(--err);font-size:13px;margin-top:10px}
+  .login-card .demo{margin-top:16px;padding:10px 12px;border-radius:8px;background:var(--accent-soft);font-size:12px;color:var(--muted)}
+  .who-am-i{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+  .who-am-i b{color:var(--text)}
+  .flash{animation:flash .9s}
+  @keyframes flash{0%{box-shadow:0 0 0 0 var(--accent)}100%{box-shadow:0 0 0 12px transparent}}
+
+  @media (max-width:560px){
+    .who-am-i .hi{display:none}
+    .bk{grid-template-columns:1fr auto}
+    .bk .when{grid-column:1/-1}
+    .slots{grid-template-columns:repeat(3,1fr)}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body class="locked">
+
+<div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="login-title">
+  <form class="login-card" id="login-form" novalidate>
+    <div class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 14 6l4 4-4 4H9"/><path d="m14 14 7 7"/><path d="M17 3l4 4"/></svg></div>
+    <div class="eyebrow">Casa Navaja · Personal</div>
+    <h2 id="login-title">Iniciar sesión</h2>
+    <div class="field"><label for="l-user">Usuario</label><select id="l-user" required><option value="" disabled selected>Elige tu nombre</option></select></div>
+    <div class="field"><label for="l-pass">Contraseña</label><input id="l-pass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <p class="err" id="l-err" hidden></p>
+    <button class="btn" type="submit">Entrar</button>
+    <p class="demo">Página de demostración: cualquier contraseña te deja entrar.</p>
+  </form>
+</div>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">Casa Navaja<small>Panel del personal</small></div>
+    <div class="who-am-i">
+      <span class="hi">Hola, <b id="who"></b></span>
+      <a class="btn btn-line btn-sm" href="../Casa-Navaja-Barbershop.html" target="_blank" rel="noopener">Ver sitio</a>
+      <button class="btn btn-line btn-sm" id="logout">Cerrar sesión</button>
+    </div>
+  </div>
+</header>
+<div class="pole" aria-hidden="true"></div>
+
+<main class="wrap">
+  <div class="eyebrow" id="me-name">Solo personal autorizado</div>
+  <h1>Mi agenda</h1>
+  <p class="lede">Elige el día y toca las horas que <b>ya tienes ocupadas</b> (citas por teléfono, en persona o cuando no vas a estar). Todas las demás horas quedan disponibles para que los clientes reserven. Cuando termines, presiona <b>Actualizar</b>.</p>
+
+  <div class="block">
+    <div class="label">1 · Elige el día</div>
+    <div class="days" id="days"></div>
+  </div>
+
+  <div class="block card">
+    <div class="card-head">
+      <h2 id="day-title"></h2>
+      <div class="tools">
+        <button class="btn btn-line btn-sm" id="all">Ocupar todo el día</button>
+        <button class="btn btn-line btn-sm" id="clear">Liberar todo el día</button>
+        <button class="btn btn-line btn-sm" id="copy">Copiar a toda la semana</button>
+      </div>
+    </div>
+    <div class="legend"><span><i class="l-free"></i>Libre (los clientes pueden reservar)</span><span><i class="l-busy"></i>Ocupado (marcado por ti)</span><span><i class="l-book"></i>Reservado en la página</span></div>
+    <div class="slots" id="slots"></div>
+  </div>
+
+  <div class="block card">
+    <div class="card-head"><h2>Mis próximas reservas</h2></div>
+    <div class="bookings" id="bookings"></div>
+  </div>
+</main>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="state" id="state"><span class="dot"></span><span><b id="state-t"></b><small id="state-s"></small></span></div>
+    <button class="btn" id="publish">Actualizar</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../datos.js"></script>
+<script>
+// Respaldo: si datos.js no está junto a esta página (por ejemplo, abierta suelta desde WhatsApp),
+// todo sigue funcionando, pero solo en este navegador.
+window.CN || (window.CN = (function(){
+  const K = {sched:'casa-navaja-ocupados', book:'casa-navaja-reservas', rev:'casa-navaja-resenas'};
+  const readJSON = (k, f) => { try { return JSON.parse(localStorage.getItem(k)) ?? f; } catch(e){ return f; } };
+  const writeJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } };
+  const today = () => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`; };
+  const id = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+  const fmtDate = t => new Date(t).toLocaleDateString('es-CO', {day:'numeric', month:'short', year:'numeric'}).replace('.', '');
+  return {
+    online: false,
+    async loadSchedule(){ return readJSON(K.sched, {updated:null, slots:{}}); },
+    async loadTaken(){ return readJSON(K.book, []).map(b => ({pro:b.pro, date:b.date, time:b.time})); },
+    async loadBookings(pro){ return readJSON(K.book, []).filter(b => b.pro===pro && b.date >= today()); },
+    async publish(pro, mine){
+      const slots = readJSON(K.sched, {slots:{}}).slots || {};
+      if(mine && Object.keys(mine).length) slots[pro] = mine; else delete slots[pro];
+      const next = {updated: Date.now(), slots};
+      if(!writeJSON(K.sched, next)) throw new Error('No se pudo guardar en este navegador.');
+      return next;
+    },
+    async book(b){
+      const list = readJSON(K.book, []), sched = readJSON(K.sched, {slots:{}});
+      if(list.some(x => x.pro===b.pro && x.date===b.date && x.time===b.time) || (sched.slots?.[b.pro]?.[b.date] || []).includes(b.time)) return {ok:false};
+      list.push({id: id(), ...b, at: Date.now()}); writeJSON(K.book, list);
+      return {ok:true};
+    },
+    async cancelBooking(bid){ writeJSON(K.book, readJSON(K.book, []).filter(b => b.id !== bid)); },
+    async loadReviews(){ return readJSON(K.rev, []); },
+    async addReview(r){ const l = readJSON(K.rev, []), x = {id: id(), ...r, t: fmtDate(Date.now())}; l.push(x); writeJSON(K.rev, l); return x; },
+    async deleteReview(rid){ writeJSON(K.rev, readJSON(K.rev, []).filter(r => r.id !== rid)); },
+    isMine(){ return true; },
+    onChange(cb){ addEventListener('storage', e => { const m = {[K.sched]:'schedule', [K.book]:'bookings', [K.rev]:'reviews'}[e.key]; if(m) cb(m); }); },
+  };
+})());
+</script>
+<script>
+// Mismo orden que el equipo en Casa-Navaja-Barbershop.html (el índice identifica al barbero)
+const team = ['Sebastián Ríos','Andrés Molina','Mateo Cárdenas','Jorge Salazar','Kevin Duque'];
+// Se guardan las horas OCUPADAS de cada barbero; todo lo demás está disponible.
+// Lo publicado y las reservas pasan por datos.js (Supabase si está configurado, si no este navegador).
+const DRAFT_KEY = 'casa-navaja-borrador-v2'; // cambios sin publicar (solo en este aparato) + la versión de la que partieron
+const DAYS_AHEAD = 14;
+
+const $ = id => document.getElementById(id);
+const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const readJSON = (k, f) => { try { return JSON.parse(localStorage.getItem(k)) ?? f; } catch(e){ return f; } };
+const writeJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } };
+const initials = n => n.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+const dateKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+// Horario de la barbería: domingo 9–15, resto 8–21, turnos de 30 min
+const slotsFor = d => { const [a,b] = d.getDay()===0 ? [9,15] : [8,21]; const out=[]; for(let h=a; h<b; h++) for(const m of [0,30]) out.push(`${String(h).padStart(2,'0')}:${m?'30':'00'}`); return out; };
+const label = t => { const [h,m] = t.split(':').map(Number); return `${h>12?h-12:h}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`; };
+const days = Array.from({length:DAYS_AHEAD}, (_,k) => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+k); return d; });
+
+let published = {updated:null, slots:{}};
+const store = readJSON(DRAFT_KEY, {draft:{}, base:{}});
+let draft = store.draft;
+let bookings = [];
+let pro = 0, dayIdx = 0, loading = false;
+
+const cleanOne = o => clean({x: o || {}}).x || {};
+async function loadPublished(){
+  // ¿Hay ediciones locales sin publicar respecto a la versión de la que partió este aparato?
+  const hadEdits = JSON.stringify(cleanOne(draft[pro])) !== JSON.stringify(cleanOne(store.base[pro]));
+  published = await CN.loadSchedule(pro);
+  const latest = published.slots[pro] || {};
+  // Sin ediciones locales, el borrador sigue a lo publicado (p. ej. si se cambió desde otro aparato)
+  if(!hadEdits) draft[pro] = structuredClone(latest);
+  store.base[pro] = structuredClone(latest);
+  writeJSON(DRAFT_KEY, store);
+}
+async function loadBookings(){ bookings = await CN.loadBookings(pro); }
+
+const list = (p, key) => (draft[p] ||= {}, draft[p][key] ||= []);
+// Cada barbero solo compara y publica su propio horario
+const isDirty = () => JSON.stringify(clean(draft)[pro] || {}) !== JSON.stringify(clean(published.slots)[pro] || {});
+function clean(obj){ // quita días pasados y vacíos, ordena horas
+  const today = dateKey(days[0]), out = {};
+  for(const p of Object.keys(obj).sort()) for(const k of Object.keys(obj[p]).sort()){
+    if(k < today || !obj[p][k].length) continue;
+    (out[p] ||= {})[k] = [...new Set(obj[p][k])].sort();
+  }
+  return out;
+}
+const bookingAt = (p, key, t) => bookings.find(b => b.pro===p && b.date===key && b.time===t);
+const isPast = (d, t) => { const [h,m] = t.split(':').map(Number); const x = new Date(d); x.setHours(h,m); return x <= new Date(); };
+
+function saveDraft(){ writeJSON(DRAFT_KEY, store); renderState(); }
+
+function render(){
+  $('days').innerHTML = days.map((d,k) => {
+    const key = dateKey(d), c = (draft[pro]?.[key] || []).filter(t => !bookingAt(pro, key, t)).length;
+    return `<button class="day ${k===dayIdx?'sel':''}" data-day="${k}">${k===0?'Hoy':dayNames[d.getDay()]}<b>${d.getDate()}</b><em class="${c?'has':''}">${c ? c + (c===1?' ocupada':' ocupadas') : 'Libre'}</em></button>`;
+  }).join('');
+  const d = days[dayIdx], key = dateKey(d), taken = new Set(draft[pro]?.[key] || []);
+  $('day-title').textContent = d.toLocaleDateString('es-CO', {weekday:'long', day:'numeric', month:'long'});
+  $('slots').innerHTML = slotsFor(d).map(t => {
+    const bk = bookingAt(pro, key, t);
+    if(bk) return `<button class="slot booked" disabled title="${esc(bk.name)} · ${esc(bk.svc)}">${label(t)}<small>${esc(bk.name.split(' ')[0])}</small></button>`;
+    const past = isPast(d, t), on = taken.has(t);
+    return `<button class="slot ${on?'busy':''}" data-t="${t}" ${past?'disabled':''} aria-pressed="${on}">${label(t)}${past ? '<small>Pasó</small>' : on ? '<small>Ocupado</small>' : '<small class="ok">Libre</small>'}</button>`;
+  }).join('');
+  const mine = bookings.filter(b => b.pro===pro && b.date >= dateKey(days[0])).sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
+  $('bookings').innerHTML = mine.length ? mine.map(b => {
+    const dd = new Date(b.date+'T00:00');
+    return `<div class="bk"><span class="when">${dd.toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'})} · ${label(b.time)}</span>
+      <span class="who"><b>${esc(b.name)}</b><small>${esc(b.svc)} · ${esc(b.phone)}</small></span>
+      <button class="btn btn-line btn-sm" data-cancel="${esc(b.id)}">Cancelar</button></div>`;
+  }).join('') : '<p class="empty">Todavía no tienes reservas.</p>';
+  renderState();
+}
+function renderState(){
+  if(loading){ $('state-t').textContent = 'Cargando…'; $('state-s').textContent = CN.online ? 'Conectando con la agenda en línea' : ''; return; }
+  const dirty = isDirty();
+  $('state').classList.toggle('dirty', dirty);
+  $('state-t').textContent = dirty ? 'Tienes cambios sin publicar' : 'Todo está publicado';
+  $('state-s').textContent = published.updated
+    ? 'Última actualización: ' + new Date(published.updated).toLocaleString('es-CO', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'})
+    : 'Aún no se ha publicado ningún horario';
+}
+
+$('days').addEventListener('click', e => { const b = e.target.closest('[data-day]'); if(!b) return; dayIdx = +b.dataset.day; render(); });
+$('slots').addEventListener('click', e => {
+  const b = e.target.closest('[data-t]'); if(!b || b.disabled) return;
+  const arr = list(pro, dateKey(days[dayIdx])), t = b.dataset.t, i = arr.indexOf(t);
+  i >= 0 ? arr.splice(i,1) : arr.push(t);
+  saveDraft(); render();
+});
+$('all').onclick = () => {
+  const d = days[dayIdx], arr = list(pro, dateKey(d));
+  slotsFor(d).forEach(t => { if(!isPast(d,t) && !arr.includes(t)) arr.push(t); });
+  saveDraft(); render();
+};
+$('clear').onclick = () => { list(pro, dateKey(days[dayIdx])).length = 0; saveDraft(); render(); };
+$('copy').onclick = () => {
+  const src = days[dayIdx], from = list(pro, dateKey(src));
+  if(!confirm(`¿Copiar el horario de este día a los siguientes 6 días?`)) return;
+  for(let k=1; k<=6 && dayIdx+k < days.length; k++){
+    const d = days[dayIdx+k], valid = new Set(slotsFor(d));
+    draft[pro][dateKey(d)] = from.filter(t => valid.has(t));
+  }
+  saveDraft(); render();
+};
+$('bookings').addEventListener('click', async e => {
+  const b = e.target.closest('[data-cancel]'); if(!b) return;
+  if(!confirm('¿Cancelar esta reserva? El turno vuelve a quedar libre.')) return;
+  b.disabled = true;
+  try { await CN.cancelBooking(b.dataset.cancel); await loadBookings(); }
+  catch(ex){ console.error(ex); alert('No se pudo cancelar. Revisa tu conexión e inténtalo de nuevo.'); }
+  render();
+});
+$('publish').onclick = async () => {
+  const btn = $('publish'), mine = clean(draft)[pro];
+  btn.disabled = true; btn.textContent = 'Guardando…';
+  try {
+    const res = await CN.publish(pro, mine);
+    published = {updated: res.updated, slots: {...published.slots, [pro]: mine || {}}};
+    draft[pro] = structuredClone(mine || {});
+    store.base[pro] = structuredClone(mine || {});
+    writeJSON(DRAFT_KEY, store);
+    render();
+    btn.textContent = '¡Actualizado!'; btn.classList.add('flash');
+    setTimeout(() => { btn.textContent = 'Actualizar'; btn.classList.remove('flash'); }, 1600);
+  } catch(ex){
+    console.error(ex);
+    btn.textContent = 'Actualizar';
+    alert('No se pudo publicar. Revisa tu conexión e inténtalo de nuevo. Tus cambios siguen guardados como borrador.');
+  } finally { btn.disabled = false; }
+};
+// Reservas nuevas y cambios hechos desde otro aparato se reflejan aquí
+CN.onChange(async type => {
+  if(document.body.classList.contains('locked') || loading) return;
+  try {
+    if(type === 'bookings' || type === 'all') await loadBookings();
+    if(type === 'schedule' || type === 'all') await loadPublished();
+  } catch(ex){ console.error(ex); return; }
+  render();
+});
+addEventListener('beforeunload', e => { if(isDirty()){ e.preventDefault(); e.returnValue = ''; } });
+
+// Inicio de sesión de DEMOSTRACIÓN: acepta cualquier usuario y contraseña.
+// No es seguridad real; para producción hay que validar contra un servidor.
+const SESSION_KEY = 'casa-navaja-sesion-personal';
+// Cada barbero entra con su nombre y solo ve y edita su propio horario.
+$('l-user').insertAdjacentHTML('beforeend', team.map((n,i) => `<option value="${i}">${n}</option>`).join(''));
+async function enter(i){
+  pro = i;
+  $('who').textContent = team[i].split(' ')[0];
+  $('me-name').textContent = team[i];
+  document.body.classList.remove('locked');
+  $('login').hidden = true;
+  dayIdx = 0; loading = true; render();
+  try { await Promise.all([loadPublished(), loadBookings()]); }
+  catch(ex){ console.error(ex); alert('No se pudo cargar tu agenda. Revisa tu conexión y recarga la página.'); }
+  loading = false; render();
+}
+$('login-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const user = $('l-user').value, pass = $('l-pass').value;
+  const err = user === '' ? 'Elige tu nombre en la lista.' : !pass ? 'Escribe tu contraseña.' : '';
+  if(err){ $('l-err').textContent = err; $('l-err').hidden = false; return; }
+  try { sessionStorage.setItem(SESSION_KEY, user); } catch(err){}
+  $('l-pass').value = ''; $('l-err').hidden = true;
+  enter(+user);
+});
+$('logout').onclick = () => {
+  if(isDirty() && !confirm('Tienes cambios sin publicar. ¿Cerrar sesión de todos modos? Quedarán guardados como borrador.')) return;
+  try { sessionStorage.removeItem(SESSION_KEY); } catch(err){}
+  $('l-user').selectedIndex = 0;
+  document.body.classList.add('locked');
+  $('login').hidden = false;
+  $('l-user').focus();
+};
+let saved = null;
+try { saved = sessionStorage.getItem(SESSION_KEY); } catch(err){}
+if(saved !== null && team[+saved]) enter(+saved); else $('l-user').focus();
+</script>
+</body>
+</html>
